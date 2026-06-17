@@ -109,4 +109,45 @@ async getStats(
   };
 }
 
+async getDashboardStats(userId: string) {
+  const monitors = await this.prisma.monitor.findMany({
+    where: {
+      userId,
+    },
+  });
+
+  const totalMonitors = monitors.length;
+
+  const onlineMonitors =
+    monitors.filter(m => m.currentStatus).length;
+
+  const offlineMonitors =
+    totalMonitors - onlineMonitors;
+
+  const checks =
+    await this.prisma.monitorCheck.findMany({
+      where: {
+        monitor: {
+          userId,
+        },
+      },
+    });
+
+  const averageResponseTime =
+    checks.length > 0
+      ? Math.round(
+          checks.reduce(
+            (sum, c) => sum + (c.responseTime ?? 0),
+            0,
+          ) / checks.length,
+        )
+      : 0;
+
+  return {
+    totalMonitors,
+    onlineMonitors,
+    offlineMonitors,
+    averageResponseTime,
+  };
+}
 }
