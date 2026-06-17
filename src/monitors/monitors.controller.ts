@@ -16,6 +16,8 @@ import { MonitorsService } from './monitors.service';
 
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+import { Param } from '@nestjs/common';
+
 @ApiTags('monitors')
 @ApiBearerAuth('access-token')
 @Controller('monitors')
@@ -46,6 +48,28 @@ export class MonitorsController {
   ) {
     return this.monitorsService.findAll(
       user.id,
+    );
+  }
+
+  @Get(':id/history')
+  history(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+    ) {
+    return this.monitorsService.getHistory(
+        id,
+        user.id,
+    );
+ }
+
+  @Get(':id/stats')
+  stats(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+    ) {
+    return this.monitorsService.getStats(
+        id,
+        user.id,
     );
   }
 }
