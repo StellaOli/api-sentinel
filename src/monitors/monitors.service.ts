@@ -3,26 +3,35 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 import { CreateMonitorDto } from './dto/create-monitor.dto';
+import { MonitorCheckQueue } from 'src/monitor-checks/monitor-check.queue';
 
 @Injectable()
 export class MonitorsService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly monitorCheckQueue: MonitorCheckQueue,
   ) {}
 
-  async create(
-    userId: string,
-    dto: CreateMonitorDto,
-  ) {
-    console.log('SERVICE USER ID:', userId);
+  async create(userId: string, dto: CreateMonitorDto) {
+  console.log("🔥 ENTERED CREATE MONITOR");
 
-    return this.prisma.monitor.create({
-      data: {
-        ...dto,
-        userId,
-      },
-    });
-  }
+  const monitor = await this.prisma.monitor.create({
+    data: {
+      ...dto,
+      userId,
+    },
+  });
+
+  console.log("🔥 MONITOR CREATED:", monitor.id);
+
+  console.log("🔥 ABOUT TO CALL QUEUE");
+
+  await this.monitorCheckQueue.scheduleMonitorCheck(monitor);
+
+  console.log("🔥 QUEUE CALLED");
+
+  return monitor;
+}
 
   async findAll(userId: string) {
     return this.prisma.monitor.findMany({

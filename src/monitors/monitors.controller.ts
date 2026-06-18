@@ -62,6 +62,15 @@ export class MonitorsController {
     );
  }
 
+ @Get('stats')
+dashboardStats(
+  @CurrentUser() user: any,
+) {
+  return this.monitorsService.getDashboardStats(
+    user.id,
+  );
+}
+
   @Get(':id/stats')
   stats(
     @Param('id') id: string,

@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { MonitorsModule } from './monitors/monitors.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MonitorChecksModule } from './monitor-checks/monitor-checks.module';
+import { BullModule } from "@nestjs/bullmq";
 
 @Module({
   imports: [
@@ -18,6 +19,12 @@ import { MonitorChecksModule } from './monitor-checks/monitor-checks.module';
     UsersModule,
     AuthModule,
     MonitorsModule,
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
     ScheduleModule.forRoot(),
     MonitorChecksModule,
   ],
